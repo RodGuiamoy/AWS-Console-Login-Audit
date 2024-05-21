@@ -27,10 +27,11 @@ def is_user_in_whitelist(user_name):
             email_tag_value = tag['Value']
             break
     
-    if email_tag_value.lower() in [item.lower() for item in whitelist]:
-        return True
-    else:
-        return False
+    if email_tag_value is not None:
+        if email_tag_value.lower() in [item.lower() for item in whitelist]:
+            return True
+        else:
+            return False
 
 def main(aws_environment):
     
