@@ -18,7 +18,7 @@ def main(aws_environment):
     aws_environment = aws_environment.replace(" ", "")
     
     # Define the CSV file name
-    csv_file_name = f"AWS{aws_environment}_{formatted_date}.csv"
+    csv_file_name = f"{aws_environment}_{formatted_date}.csv"
     
     # Define the header names based on the data we are collecting
     headers = ['UserName', 'ConsoleAccess', 'LastLogin']
