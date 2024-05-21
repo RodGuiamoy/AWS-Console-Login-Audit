@@ -27,7 +27,7 @@ def is_user_in_whitelist(user_name):
             email_tag_value = tag['Value']
             break
     
-    if email_tag_value in whitelist:
+    if email_tag_value.lower() in [item.lower() for item in whitelist]:
         return True
     else:
         return False
