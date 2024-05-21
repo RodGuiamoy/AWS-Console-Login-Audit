@@ -21,7 +21,7 @@ def main(aws_environment):
     csv_file_name = f"{aws_environment}_{formatted_date}.csv"
     
     # Define the header names based on the data we are collecting
-    headers = ['UserName', 'ConsoleAccess', 'LastLogin']
+    headers = ['UserName', 'ConsoleAccess', 'LastLogin', 'LoggedInAfterDisablementDate']
     
     # Open a new CSV file
     with open(csv_file_name, mode='w', newline='') as file:
@@ -50,12 +50,23 @@ def main(aws_environment):
                 if 'PasswordLastUsed' in user_detail['User']:
                     last_login = user_detail['User']['PasswordLastUsed'].strftime('%Y-%m-%d %H:%M:%S')
                 else:
-                    last_login = None             
+                    last_login = None
+                    
+                # Define the reference date and time
+                reference_date = datetime.datetime(2024, 3, 26, 0, 0)
+
+                # Check if last_login was after the reference date
+                if last_login and last_login > reference_date:
+                    logged_in_after_disablement_date = True
+                else:
+                    logged_in_after_disablement_date = False
+                    
                 # Write the user's details to the CSV
                 writer.writerow({
                     'UserName': username,
                     'ConsoleAccess': console_access,
-                    'LastLogin': last_login
+                    'LastLogin': last_login,
+                    'LoggedInAfterDisablementDate': logged_in_after_disablement_date
                 })
                 
                 print (f"{username},{console_access},{last_login}")
