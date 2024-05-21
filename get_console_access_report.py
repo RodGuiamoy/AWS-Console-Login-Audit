@@ -90,6 +90,7 @@ def main(aws_environment):
                     last_login = last_login.strftime('%Y-%m-%d %H:%M:%S')
                 else:
                     last_login = None
+                    logged_in_after_disablement_date = None
                     
                 # Write the user's details to the CSV
                 writer.writerow({
