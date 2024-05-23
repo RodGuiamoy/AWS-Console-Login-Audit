@@ -6,32 +6,78 @@ import sys
 # Create an IAM client
 iam = boto3.client('iam')
 
-# Function to check if the email tag is in the whitelist
-def is_user_in_whitelist(user_name):
-    
-    whitelist = ["joshuagrabinger@deltek.com", 
-                 "amirjoven@deltek.com", 
-                 "markanthonysampayan@deltek.com",
-                 "michaelmarsek@deltek.com",
-                 "febinrajan@deltek.com",
-                 "claudestevenbayla@deltek.com",
-                 "tristansantiago@deltek.com",
-                 "angeloallas@deltek.com"]
+def get_user_tags(username):
+    response = iam.list_user_tags(UserName=username)
+    return {tag['Key']: tag['Value'] for tag in response['Tags']}
 
-    response = iam.list_user_tags(UserName=user_name)
-    tags = response['Tags']
+# # Function to check if the email tag is in the whitelist
+# def is_user_in_whitelist(user_tags):
     
-    email_tag_value = None
-    for tag in tags:
-        if tag['Key'] == 'email':
-            email_tag_value = tag['Value']
-            break
+#     whitelist = ["joshuagrabinger@deltek.com", 
+#                  "amirjoven@deltek.com", 
+#                  "markanthonysampayan@deltek.com",
+#                  "michaelmarsek@deltek.com",
+#                  "febinrajan@deltek.com",
+#                  "claudestevenbayla@deltek.com",
+#                  "tristansantiago@deltek.com",
+#                  "angeloallas@deltek.com"]
+
+#     # # response = iam.list_user_tags(UserName=user_name)
+#     # tags = get_user_tags(user_name)
     
-    if email_tag_value is not None:
-        if email_tag_value.lower() in [item.lower() for item in whitelist]:
-            return True
+#     email_tag_value = None
+#     for tag in user_tags:
+#         if tag['Key'] == 'email':
+#             email_tag_value = tag['Value']
+#             break
+    
+#     if email_tag_value is not None:
+#         if email_tag_value.lower() in [item.lower() for item in whitelist]:
+#             return True
+#         else:
+#             return False
+        
+#     return False
+
+def is_service_account(user_tags):
+    employee_ID = user_tags.get('employeeID', None) # Default to None if 'employeeID' tag doesn't exist
+            
+    if employee_ID == 'service-account':
+        return True
+    
+    return False
+
+def get_mfa(username):
+    # List MFA devices for the specified user
+    response = iam.list_mfa_devices(UserName=username)
+
+    # Extract and print the list of MFA devices
+    mfa_devices = response.get('MFADevices', [])
+
+    # Extract serial numbers and join them with a separator (e.g., ', ')
+    serial_numbers = [device['SerialNumber'] for device in mfa_devices]
+    serial_numbers_string = ', '.join(serial_numbers)
+
+    # Print the serial numbers in one line
+    return serial_numbers_string
+    
+
+def get_access_keys(username):
+    try:
+        # Get the access keys for the specified user
+        access_keys = iam.list_access_keys(UserName=username)['AccessKeyMetadata']
+        if not access_keys:
+            result = None
         else:
-            return False
+            result_lines = []
+            for key in access_keys:
+                result_lines.append(f"Access Key ID: {key['AccessKeyId']}, Status: {key['Status']}")
+            result = "\n".join(result_lines)
+    except Exception as e:
+        result = f"An error occurred: {e}"
+
+    # print(result)
+    return result
 
 def main(aws_environment):
     
@@ -48,7 +94,7 @@ def main(aws_environment):
     csv_file_name = f"{aws_environment}_{formatted_date}.csv"
     
     # Define the header names based on the data we are collecting
-    headers = ['UserName', 'Whitelisted', 'ConsoleAccess', 'LastLogin', 'LoggedInAfterDisablementDate']
+    headers = ['UserName', 'ConsoleAccess', 'LastLogin', 'LoggedInAfterDisablementDate', 'IsServiceAccount', 'MFA', 'AccessKeys']
     
     # Open a new CSV file
     with open(csv_file_name, mode='w', newline='') as file:
@@ -63,9 +109,12 @@ def main(aws_environment):
             for user in response['Users']:
                 
                 username = user['UserName']
+                user_tags = get_user_tags(username)
                 
-                whitelisted = is_user_in_whitelist(username)
-
+                service_account = is_service_account(user_tags)
+                mfa = get_mfa(username)
+                access_keys = get_access_keys(username)
+                                
                 # Get login profile to check console access
                 try:
                     iam.get_login_profile(UserName=user['UserName'])
@@ -96,13 +145,15 @@ def main(aws_environment):
                 # Write the user's details to the CSV
                 writer.writerow({
                     'UserName': username,
-                    'Whitelisted': whitelisted,
                     'ConsoleAccess': console_access,
                     'LastLogin': last_login,
-                    'LoggedInAfterDisablementDate': logged_in_after_disablement_date
+                    'LoggedInAfterDisablementDate': logged_in_after_disablement_date,
+                    'IsServiceAccount': service_account,
+                    'MFA': mfa,
+                    'AccessKeys': access_keys
                 })
                 
-                print (f"{username},{console_access},{last_login},{logged_in_after_disablement_date}")
+                print (f"{username}")
 
 if __name__ == "__main__":
     aws_environment = sys.argv[1]
