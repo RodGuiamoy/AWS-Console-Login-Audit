@@ -99,7 +99,7 @@ def main(aws_environment):
     csv_file_name = f"{aws_environment}_{formatted_date}.csv"
     
     # Define the header names based on the data we are collecting
-    headers = ['UserName', 'Email', 'ConsoleAccess', 'LastLogin', 'LoggedInAfterDisablementDate', 'IsServiceAccount', 'MFA', 'AccessKeys']
+    headers = ['UserName', 'Email', 'ConsoleAccess', 'IsServiceAccount', 'MFA', 'AccessKeys', 'LastLogin', 'LoggedInAfterDisablementDate', 'ForImmediateDeletion']
     
     # Open a new CSV file
     with open(csv_file_name, mode='w', newline='') as file:
@@ -148,6 +148,11 @@ def main(aws_environment):
                     last_login = None
                     logged_in_after_disablement_date = None
                     
+                if ((service_account == False) and (mfa is not None) and (console_access == False) and ("Active" not in access_keys)):
+                    for_immediate_deletion = True
+                else:
+                    for_immediate_deletion = False
+                    
                 # Write the user's details to the CSV
                 writer.writerow({
                     'UserName': username,
@@ -157,7 +162,8 @@ def main(aws_environment):
                     'LoggedInAfterDisablementDate': logged_in_after_disablement_date,
                     'IsServiceAccount': service_account,
                     'MFA': mfa,
-                    'AccessKeys': access_keys
+                    'AccessKeys': access_keys,
+                    'ForImmediateDeletion': for_immediate_deletion
                 })
                 
                 print (f"{username}")
