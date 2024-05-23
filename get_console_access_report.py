@@ -72,7 +72,7 @@ def get_access_keys(username):
         # Get the access keys for the specified user
         access_keys = iam.list_access_keys(UserName=username)['AccessKeyMetadata']
         if not access_keys:
-            result = None
+            result = "No access keys"
         else:
             result_lines = []
             for key in access_keys:
