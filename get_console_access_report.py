@@ -39,13 +39,10 @@ def get_user_tags(username):
         
 #     return False
 
-def get_email_address(user_tags):
-    email_tag_value = None
-    for tag in user_tags:
-        if tag['Key'] == 'email':
-            return tag['Value']
+def get_email_address(user_tags):        
+    email = user_tags.get('email', None)
         
-    return None
+    return email
 
 def is_service_account(user_tags):
     employee_ID = user_tags.get('employeeID', None) # Default to None if 'employeeID' tag doesn't exist
