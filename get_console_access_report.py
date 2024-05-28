@@ -6,10 +6,6 @@ import sys
 # Create an IAM client
 iam = boto3.client('iam')
 
-def get_user_tags(username):
-    response = iam.list_user_tags(UserName=username)
-    return {tag['Key']: tag['Value'] for tag in response['Tags']}
-
 # # Function to check if the email tag is in the whitelist
 # def is_user_in_whitelist(user_tags):
     
@@ -38,6 +34,10 @@ def get_user_tags(username):
 #             return False
         
 #     return False
+
+def get_user_tags(username):
+    response = iam.list_user_tags(UserName=username)
+    return {tag['Key']: tag['Value'] for tag in response['Tags']}
 
 def get_email_address(user_tags):        
     email = user_tags.get('email', None)
