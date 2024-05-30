@@ -58,6 +58,10 @@ def get_mfa(username):
 
     # Extract and print the list of MFA devices
     mfa_devices = response.get('MFADevices', [])
+    
+    # Check if there are no MFA devices and return None if so
+    if not mfa_devices:
+        return None
 
     # Extract serial numbers and join them with a separator (e.g., ', ')
     serial_numbers = [device['SerialNumber'] for device in mfa_devices]
@@ -147,7 +151,7 @@ def main(aws_environment):
                 else:
                     last_login = None
                     logged_in_after_disablement_date = None
-                    
+                
                 if ((service_account == False) and (mfa is not None) and (console_access == False) and ("Active" not in access_keys)):
                     for_immediate_deletion = True
                 else:
@@ -167,7 +171,7 @@ def main(aws_environment):
                 })
                 
                 print (f"{username}")
-
+                
 if __name__ == "__main__":
     aws_environment = sys.argv[1]
     main(aws_environment)
