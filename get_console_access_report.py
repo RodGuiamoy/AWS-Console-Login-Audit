@@ -44,6 +44,11 @@ def get_email_address(user_tags):
         
     return email
 
+def get_employee_id(user_tags):        
+    employee_id = user_tags.get('employeeID', None)
+        
+    return employee_id
+
 def is_service_account(user_tags):
     employee_ID = user_tags.get('employeeID', None) # Default to None if 'employeeID' tag doesn't exist
             
@@ -103,7 +108,7 @@ def main(aws_environment):
     csv_file_name = f"{aws_environment}_{formatted_date}.csv"
     
     # Define the header names based on the data we are collecting
-    headers = ['UserName', 'Email', 'ConsoleAccess', 'IsServiceAccount', 'MFA', 'AccessKeys', 'LastLogin', 'LoggedInAfterDisablementDate', 'ForImmediateDeletion']
+    headers = ['UserName', 'Email', 'EmployeeID', 'ConsoleAccess', 'IsServiceAccount', 'MFA', 'AccessKeys', 'LastLogin', 'LoggedInAfterDisablementDate', 'ForImmediateDeletion']
     
     # Open a new CSV file
     with open(csv_file_name, mode='w', newline='') as file:
@@ -121,6 +126,7 @@ def main(aws_environment):
                 user_tags = get_user_tags(username)
                 
                 email = get_email_address(user_tags)
+                employee_id = get_employee_id(user_tags)
                 service_account = is_service_account(user_tags)
                 mfa = get_mfa(username)
                 access_keys = get_access_keys(username)
@@ -161,6 +167,7 @@ def main(aws_environment):
                 writer.writerow({
                     'UserName': username,
                     'Email': email,
+                    'EmployeeID': employee_id,
                     'ConsoleAccess': console_access,
                     'LastLogin': last_login,
                     'LoggedInAfterDisablementDate': logged_in_after_disablement_date,
