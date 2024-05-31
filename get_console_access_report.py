@@ -108,7 +108,7 @@ def main(aws_environment):
     csv_file_name = f"{aws_environment}_{formatted_date}.csv"
     
     # Define the header names based on the data we are collecting
-    headers = ['AWSAccountID','UserName', 'Email', 'EmployeeID', 'ConsoleAccess', 'IsServiceAccount', 'MFA', 'AccessKeys', 'LastLogin', 'LoggedInAfterDisablementDate', 'ForImmediateDeletion']
+    headers = ['AWSEnvironment','AWSAccountID','UserName', 'Email', 'EmployeeID', 'ConsoleAccess', 'IsServiceAccount', 'MFA', 'AccessKeys', 'LastLogin', 'LoggedInAfterDisablementDate', 'ForImmediateDeletion']
     
     # Open a new CSV file
     with open(csv_file_name, mode='w', newline='') as file:
@@ -167,6 +167,7 @@ def main(aws_environment):
                     
                 # Write the user's details to the CSV
                 writer.writerow({
+                    'AWSEnvironment': aws_environment,
                     'AWSAccountID': account_id,
                     'UserName': username,
                     'Email': email,
