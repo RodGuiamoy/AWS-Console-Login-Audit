@@ -108,11 +108,13 @@ def main(aws_environment):
     csv_file_name = f"{aws_environment}_{formatted_date}.csv"
     
     # Define the header names based on the data we are collecting
-    headers = ['UserName', 'Email', 'EmployeeID', 'ConsoleAccess', 'IsServiceAccount', 'MFA', 'AccessKeys', 'LastLogin', 'LoggedInAfterDisablementDate', 'ForImmediateDeletion']
+    headers = ['AWSAccountID','UserName', 'Email', 'EmployeeID', 'ConsoleAccess', 'IsServiceAccount', 'MFA', 'AccessKeys', 'LastLogin', 'LoggedInAfterDisablementDate', 'ForImmediateDeletion']
     
     # Open a new CSV file
     with open(csv_file_name, mode='w', newline='') as file:
         writer = csv.DictWriter(file, fieldnames=headers)
+        
+        account_id = boto3.client('sts').get_caller_identity().get('Account')
         
         # Write the header
         writer.writeheader()
@@ -165,6 +167,7 @@ def main(aws_environment):
                     
                 # Write the user's details to the CSV
                 writer.writerow({
+                    'AWSAccountID': account_id,
                     'UserName': username,
                     'Email': email,
                     'EmployeeID': employee_id,
