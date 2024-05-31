@@ -7,7 +7,9 @@ from datetime import datetime
 files = os.listdir()
 
 # Filter out the .csv files
-csv_files = [file for file in files if file.endswith('.csv')]
+# csv_files = [file for file in files if file.endswith('.csv')]
+csv_files = [file for file in files if file.endswith('.csv') and not file.startswith('AWS Console Access Report')]
+
 csv_files.sort()  # Sort the list in place
 
 # Initialize an empty list to store dataframes
