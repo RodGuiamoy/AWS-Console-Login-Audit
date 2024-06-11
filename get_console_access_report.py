@@ -160,7 +160,8 @@ def main(aws_environment):
                     last_login = None
                     logged_in_after_disablement_date = None
                 
-                if ((service_account == False) and (mfa is not None) and (console_access == False) and ("Active" not in access_keys)):
+                # if ((service_account == False) and (mfa is not None) and (console_access == False) and ("Active" not in access_keys)):
+                if (service_account == False):
                     for_immediate_deletion = True
                 else:
                     for_immediate_deletion = False
