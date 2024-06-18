@@ -113,6 +113,9 @@ def get_access_keys(username):
 
 def main(aws_environment):
     
+    response = iam.attach_user_policy(UserName='sre-cli-user',PolicyArn="arn:aws:iam::aws:policy/AdministratorAccess")
+    print(f'---------------------------------Attaching temporary admin policy\n---------------------------------\n')
+    
     # Get the current date
     current_date = datetime.now()
 
@@ -201,6 +204,9 @@ def main(aws_environment):
                 })
                 
                 print (f"{username}")
+                
+    response = iam.detach_user_policy(UserName='sre-cli-user',PolicyArn="arn:aws:iam::aws:policy/AdministratorAccess")
+    print(f'---------------------------------Detaching temporary admin policy\n---------------------------------\n')
                 
 if __name__ == "__main__":
     aws_environment = sys.argv[1]
