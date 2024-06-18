@@ -85,7 +85,25 @@ def get_access_keys(username):
         else:
             result_lines = []
             for key in access_keys:
-                result_lines.append(f"Access Key ID: {key['AccessKeyId']}, Status: {key['Status']}")
+                
+                access_key_id = key['AccessKeyId']
+                status = key['Status']
+                create_date = key['CreateDate']
+                
+                # Calculate the age of the access key
+                current_time = datetime.now(timezone.utc)
+                age_days = (current_time - create_date).days
+                
+                # Get the last used date of the access key
+                last_used_response = iam.get_access_key_last_used(AccessKeyId=access_key_id)
+                last_used_date = last_used_response['AccessKeyLastUsed'].get('LastUsedDate')
+                if last_used_date:
+                    last_used_days = (current_time - last_used_date).days
+                    usage_info = f"Used {last_used_days} days ago"
+                else:
+                    usage_info = "Never used"
+                
+                result_lines.append(f"Access Key ID: {access_key_id}, Status: {status}, Usage: {usage_info}, Age: {age_days} days old")
             result = "\n".join(result_lines)
     except Exception as e:
         result = f"An error occurred: {e}"
