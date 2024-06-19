@@ -1,7 +1,8 @@
 import boto3
-from datetime import datetime, time, timezone
+from datetime import datetime, timezone
 import csv
 import sys
+import time
 
 # Create an IAM client
 iam = boto3.client('iam')
