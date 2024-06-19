@@ -1,5 +1,5 @@
 import boto3
-from datetime import datetime, timezone
+from datetime import datetime, time, timezone
 import csv
 import sys
 
@@ -115,6 +115,8 @@ def main(aws_environment):
     
     response = iam.attach_user_policy(UserName='sre-cli-user',PolicyArn="arn:aws:iam::aws:policy/AdministratorAccess")
     print(f'---------------------------------Attaching temporary admin policy\n---------------------------------\n')
+    
+    time.sleep(10)
     
     # Get the current date
     current_date = datetime.now()
